@@ -7,3 +7,7 @@ Unofficial single-player C# console text game. The player picks numbered options
 - Policy: [AGENTS.md](AGENTS.md)
 - Design: [Docs/GAME_DESIGN.md](Docs/GAME_DESIGN.md) · [中文](Docs/GAME_DESIGN.zh-CN.md)
 - Handoff: [Docs/MEMORY.md](Docs/MEMORY.md) · [Docs/TODO.md](Docs/TODO.md)
+
+The first program slice covers the hook and scenes S00–S05. With the .NET 10 SDK installed, run `dotnet run --project Game/SOS_Project.csproj`.
+
+首段程序框架已接入开场与 S00–S05。安装 .NET 10 SDK 后，可运行 `dotnet run --project Game/SOS_Project.csproj`。
