@@ -6,7 +6,7 @@ SOS_Project is an unofficial single-player console text game. Scenario modules f
 
 - Prefer the smallest working change. Avoid speculative abstractions.
 - Do not use reflection unless the user explicitly asks.
-- The selected runtime is a C# console program, recorded in `Docs/GAME_DESIGN.md`. Do not scaffold that program until the user asks to implement. Do not add Unity. The parent folder name `UnityProject` is not a Unity project.
+- The selected runtime is a C# console program, recorded in `Docs/GAME_DESIGN.md` and implemented under `Game/`. Do not add Unity. The former parent folder name `UnityProject` did not denote a Unity project.
 - Do not run an IDE, engine, automated tests, or a dev server unless the user explicitly asks.
 - Do not invoke skills unless the user explicitly asks for that skill.
 - Preserve existing user changes in a dirty worktree. Never revert unrelated files.
@@ -20,19 +20,19 @@ SOS_Project is an unofficial single-player console text game. Scenario modules f
 ## Product Direction
 
 - Target: a C# console session. Mostly prose, occasional `■` pictures in console colors, numbered options, the player plays themself, deduction puzzles. Module contract: `Docs/GAME_DESIGN.md`.
-- Current implementation: documentation only. No scenes and no C# project.
+- Current implementation: the complete scenario 0 is connected to the C# console program under `Game/`. Its .NET 10 build, both endings, and Windows x64 single-file publish have been validated locally.
 
 ## Code Style
 
 - Prefer small compositional units with one responsibility.
-- When implementation starts, use C# and `System.Console`. Do not add a framework unless the user asks.
-- Keep scenario prose in future `Scenarios/` files, separate from engine code.
+- Use C# and `System.Console`. Do not add a framework unless the user asks.
+- Keep scenario prose in `Scenarios/` files, separate from engine code.
 - Prefer project-owned code. There is no vendor tree yet.
 - If a vendor tree is added later, patch it only when public APIs are insufficient, and record the reason in `Docs/MEMORY.md`.
 
 ## Ownership
 
-- Project-owned: `AGENTS.md`, `README.md`, `Docs/`, and future `Scenarios/` and source directories.
+- Project-owned: `AGENTS.md`, `README.md`, `.gitignore`, `Docs/`, `Scenarios/`, and `Game/`.
 - Do not hand-edit `.git/`.
 - `Docs/AI_PROJECT_HANDOFF_RULES.md` is the portable handoff spec. Change this project's policy in `AGENTS.md`. Do not rewrite the portable spec unless the user asks to change the handoff system.
 

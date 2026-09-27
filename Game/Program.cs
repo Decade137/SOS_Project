@@ -10,7 +10,14 @@ internal static class Program
 
         try
         {
-            return new StoryRunner(ZeroFloor.Create(), new SaveStore()).Run();
+            var saves = new SaveStore();
+            var result = new StoryRunner(ZeroFloor.Create(), saves).Run();
+            if (result == StoryRunner.SendBackCleanupResult)
+            {
+                return OwnFileCleanup.AfterSendBack(saves) ? 0 : 1;
+            }
+
+            return result;
         }
         catch (InvalidOperationException error)
         {
