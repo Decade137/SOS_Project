@@ -19,7 +19,7 @@ SOS_Project is an unofficial single-player console text game. Scenario modules f
 
 ## Product Direction
 
-- Target: a C# console session. Mostly prose, occasional `■` pictures in console colors, numbered options, the player plays themself, deduction puzzles. Module contract: `Docs/GAME_DESIGN.md`.
+- Target: a C# console session. Mostly prose, occasional `■` pictures in console colors, bullet-marked options with full-choice selection color, the player plays themself, deduction puzzles. Module contract: `Docs/GAME_DESIGN.md`.
 - Current implementation: the complete scenario 0 is connected to the C# console program under `Game/`. Its .NET 10 build, both endings, and Windows x64 single-file publish have been validated locally.
 
 ## Code Style

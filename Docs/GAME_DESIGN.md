@@ -1,10 +1,10 @@
 # Game Design Contract
 
-Status: scenario 0 is complete in the console program. The new text and menu interaction passed a .NET 10 Release build and Windows x64 single-file publish. Both endings and E01 self-deletion on a disposable copy were validated on the earlier version; the new interaction has not yet been played. English is canonical.
+Status: scenario 0 is complete in the console program. The new start screen and page layout passed a .NET 10 Release build and Windows x64 single-file publish. Both endings and E01 self-deletion on a disposable copy were validated on an earlier version; the new UI has not been played. English is canonical.
 
 ## Product
 
-SOS_Project is a single-player text game presented as a console session. The player reads narration, moves through numbered options with W/S, and confirms with Enter. Each story is a scenario module shaped like a Call of Cthulhu tabletop module. The fiction uses the world of *The Melancholy of Haruhi Suzumiya* (涼宮ハルヒの憂鬱). Play is deduction and puzzle-solving.
+SOS_Project is a single-player text game presented as a console session. The player reads narration, moves through bullet-marked options with W/S, and confirms with Enter. Each story is a scenario module shaped like a Call of Cthulhu tabletop module. The fiction uses the world of *The Melancholy of Haruhi Suzumiya* (涼宮ハルヒの憂鬱). Play is deduction and puzzle-solving.
 
 This is an unofficial fan project. Do not copy novel text, anime scripts, lyrics, or official assets.
 
@@ -13,14 +13,14 @@ This is an unofficial fan project. Do not copy novel text, anime scripts, lyrics
 - The runtime is a C# console program on .NET 10 (`net10.0`), which is the active LTS release through 2028-11-14. Text and pictures are printed with `Console.Write` / `Console.WriteLine`. The ship target is a Windows x64 self-contained single-file console exe, so a player does not install .NET. The user has asked to begin implementation; `Game/SOS_Project.csproj` is the C# project. This repository is not a Unity project. Do not add Unity files.
 - The usual frame is prose. A scene may also show one picture made of `■` and console colors. Pictures are occasional. They do not replace the read-aloud.
 - The program is the Keeper. There is one player. The player character is the player themself, not a canon member, and does not receive an invented name. The first module uses first-person Chinese narration and options; the earlier second-person direction is superseded for that module.
-- Player-facing story text is revealed character by character before the options appear. A key press completes the current text block immediately; re-reading found material is immediate. A scene shows a numbered list. W/S moves the current selection shown below the list; Enter confirms it after a selection is made. Interactive play no longer asks for a typed option number. The startup save menu uses the same controls.
+- Player-facing story text is revealed character by character before the options appear. A key press completes the current text block immediately; re-reading found material is immediate. The start screen offers New Game, Load Save, and Exit; Load Save is disabled without a valid save. Scene, action feedback, journal, and ending appear on separate cleared pages. A narrow reading column and simple character marks distinguish prose, dialogue, and choices. Scene and action pages draw a fixed-size Unicode frame before writing its contents; the content area scrolls in place when it fills. The player options area keeps a fixed position and size below it, and remains hidden until options exist. All visible menu choices start with `·`; W/S turns the full selected choice cyan, including wrapped lines, and Enter confirms. Redirected input may type the visible option text or a legacy choice key.
 - An option that solves or concludes a puzzle lists the clue ids it requires, and it is offered only after those clues are found. Other options may be offered without clues. Every selected option changes the situation.
 - Some beats show their plot options immediately. On other beats, an attribute check decides which of the current plot options are displayed. The options stay on that beat. The check only chooses the visible ones.
 - On a check beat, the player chooses which attribute to check. Success and failure each name a subset of that beat's options. The player then picks one displayed option. There is no skill list. The attribute names, the player's values, and the roll or target procedure are still open. Superseded the same day: a check beat has no option list, and a check jumps straight to a branch.
 - "CoC-like" means the module shape in this file. It does not mean using Chaosium's rulebook, Sanity, or Mythos statistics.
 - The scenario source of truth is Markdown with the headings below. The runtime uses `Scenarios/ZeroFloor.Play.cs` as explicit, compiled player-facing story data derived from it; it does not parse keeper notes at runtime.
 - The first playable release contains the complete scenario 0 with direct options. Attribute checks and trackable resources remain future system questions because this module uses neither.
-- One local save slot lives at `%LOCALAPPDATA%/SOS_Project/save.bin`. The program saves after each plot choice except final confirmation of the send-back ending: the preceding confirmation-page save stays available until cleanup, so an interrupted ending can be confirmed again. At startup, an existing save offers continue, new game, or exit; a new game replaces that slot. The versioned save stores the current scene, discovered material, flags, text choices, and any completed stay outcome.
+- One local save slot lives at `%LOCALAPPDATA%/SOS_Project/save.bin`. The program saves after each plot choice except final confirmation of the send-back ending: the preceding confirmation-page save stays available until cleanup, so an interrupted ending can be confirmed again. At startup, the separate screen offers new game, load save, or exit; a new game replaces that slot, and load save is disabled when unavailable. The versioned save stores the current scene, discovered material, flags, text choices, and any completed stay outcome.
 - The send-back ending requires the module's two explicit confirmations. After its text is shown, the program deletes this game's save. On the published Windows single-file game, a narrowly scoped helper then attempts to delete its own `SOS_Project.exe` after exit, reporting when it cannot arrange that step. It must never target another executable or user file. Source and non-Windows runs delete only the save. The stay ending keeps both.
 
 ## Module shape
@@ -105,7 +105,7 @@ The roll, target number, and full attribute list are not set. Each result names 
 
 1. Reveal the hook or current scene's read-aloud character by character. Let a key press finish the current text block.
 2. If this beat has a picture, print it with `■` and console colors. Skip the picture when the scene has none.
-3. After the text finishes, if this beat says `direct options`, show its numbered plot options.
+3. After the text finishes, if this beat says `direct options`, show its bullet-marked plot options.
 4. If this beat says `attribute check`, show the attribute choices. The player picks one attribute. Resolve the check, then show only the current plot options that result displays.
 5. The player moves through the displayed options with W/S and confirms one with Enter.
 6. Resolve it into narration plus a state change: a clue, a new scene, a changed relationship, or an outcome.
@@ -114,9 +114,9 @@ The roll, target number, and full attribute list are not set. Each result names 
 
 ### Scenario 0 runtime
 
-`Game/Program.cs`, `Game/Story.cs`, `Game/GameState.cs`, `Game/StoryRunner.cs`, and `Game/SaveStore.cs` provide the entry point, story data types, state, loop, and single save. `Game/OwnFileCleanup.cs` handles the send-back ending's narrowly scoped file cleanup. The runner reveals story text character by character, advances W/S-selected numbered choices, applies clue and flag conditions and effects, lets the player re-read found clues and handouts, and prints occasional colored `■` pictures. `Scenarios/ZeroFloor.Play.cs` compiles the Hook, S00–S16, K01–K10, H01–H04, and E01/E02 into the program. Player output contains no keeper-only notes.
+`Game/Program.cs`, `Game/Story.cs`, `Game/GameState.cs`, `Game/StoryRunner.cs`, and `Game/SaveStore.cs` provide the entry point, story data types, state, loop, and single save. `Game/OwnFileCleanup.cs` handles the send-back ending's narrowly scoped file cleanup. The runner reveals story text character by character, advances W/S-selected bullet-marked choices, applies clue and flag conditions and effects, lets the player re-read found clues and handouts, and prints occasional colored `■` pictures. `Scenarios/ZeroFloor.Play.cs` compiles the Hook, S00–S16, K01–K10, H01–H04, and E01/E02 into the program. Player output contains no keeper-only notes.
 
-The first module uses direct options only. Before this interaction change, both endings were played through after a successful .NET 10 build; E01 removed a disposable published copy after exit. The current interaction has since passed a Release build and Windows x64 self-contained single-file publish, without another playthrough. No automated test suite was run.
+The first module uses direct options only. Both endings were played through after a successful .NET 10 build; E01 removed a disposable published copy after exit. The new UI passed a later Release build and Windows x64 self-contained single-file publish, without another playthrough. No automated test suite was run.
 
 ## Fiction boundaries
 
@@ -128,13 +128,15 @@ These are available as setting. A future scenario is not official canon.
 
 The player plays themself. The first module uses first-person narration. Do not cast the player as a canon character or invent a name or personal biography for them.
 
+Before a brigade member introduces themself to the player, player-facing scene text and choice feedback identify that person through visible features and actions rather than a name. Names may be used after the introductions.
+
 Every scenario is a deduction puzzle: the player gathers clues and then chooses a conclusion that those clues unlock. The header tone note states the prose's balance of comedy and investigative pressure. For the first module, lively comedy leads and the tone turns serious near the truth.
 
 Canon characters, when present, speak in original lines written for the module.
 
-The first module is `Scenarios/00-zero-floor.md`, set in an unnamed fictional Chinese mountain city inspired by Chongqing's terrain without real place names. An abnormal Endless Eight branch brings the SOS Brigade to 2026, then repeatedly across 2009–2026. Time travel, otherworldly space, and an AI connected to alien technology / the Information Integration Thought Entity lead toward the player's origin in a worldline created by Haruhi. Comedy dominates until the investigation nears the truth. The selected route mystery includes cross-era changes in people's relationships and an AI observation puzzle. It follows the eight-stage story circle around the player's identity, origin, and destination, returning to the opening corridor for the final choice. The endings return the Brigade and close the branch with the game's local file cleanup, or remain in the apparently real created world.
+The first module is `Scenarios/00-zero-floor.md`, titled “Beyond August,” set in an unnamed fictional Chinese mountain city inspired by Chongqing's terrain without real place names. An abnormal Endless Eight branch brings the SOS Brigade to 2026, then repeatedly across 2009–2026. A staircase absent from the building plans connects the years. Yuki's and Mikuru's boundary observations, Haruhi's old leaflet, and altered photos and memories lead toward the player's origin in a worldline created by Haruhi. Comedy dominates until the investigation nears the truth. The story follows the eight-stage story circle around the player's identity, origin, and destination, returning to the opening corridor for the final choice. The endings return the Brigade and close the branch with the game's local file cleanup, or remain in the apparently real created world.
 
-The player has watched the Haruhi anime and knows Haruhi may shape worlds. Build the three questions around the player's own identity, origin, and chosen destination. Treat that anime knowledge as evidence to test and a possible false assumption, rather than saving Haruhi's ability as the twist. Do not assign the player a fabricated personal history.
+The player is assumed to know the Haruhi story and the SOS Brigade, including that Haruhi may shape worlds. Player-facing narration and choices should not explain where that familiarity came from; show it through character reactions, lived details, time traces, and gaps in the records. Build the three questions around the player's own identity, origin, and chosen destination. Treat that prior knowledge as evidence to test and a possible false assumption, rather than saving Haruhi's ability as the twist. Do not assign the player a fabricated personal history.
 
 ## Authoring rules
 
