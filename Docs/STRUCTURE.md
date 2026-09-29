@@ -17,7 +17,7 @@
 - `Game/Story.cs`: scenes, choices, clues, handouts, and outcomes.
 - `Game/GameState.cs`: current scene, discovered material, flags, text choices, and completed outcome.
 - `Game/SaveStore.cs`: the versioned single-slot local save and its integrity check.
-- `Game/StoryRunner.cs`: separate start/scene/action/journal/ending pages, fixed-size Unicode frames whose content scrolls in place, a fixed-position option frame shown only when options exist, wrapped story output with dialogue cues, bullet-marked W/S and Enter menus with full-choice selection color, state effects, immediate re-reading, and optional color pictures.
+- `Game/StoryRunner.cs`: separate start/scene/action/journal/ending pages, variable-height Unicode story frames with terminal-buffer scrolling on interactive terminals, sequentially rendered option frames, and a fixed-frame PageUp/PageDown fallback, wrapped story output with dialogue cues, bullet-marked W/S and Enter menus with full-choice selection color, state effects, immediate re-reading, and optional color pictures.
 - `Game/OwnFileCleanup.cs`: scoped send-back ending cleanup for this game's save and published exe.
 - `Scenarios/00-zero-floor.md`: authored first-person Chinese scenario 0, with the eight-stage story circle and full module sections.
 - `Scenarios/ZeroFloor.Play.cs`: compiled player-facing data for the full first scenario, Hook through S16, K01–K10, H01–H04, and E01/E02.

@@ -38,6 +38,9 @@ internal sealed class StoryRunner
     private int fixedContentHeight;
     private int fixedOptionTop;
     private int fixedOptionHeight;
+    private int fixedScrollTop;
+    private bool streamingFrameOpen;
+    private int streamingFrameBottom;
 
     internal StoryRunner(Story story, SaveStore saves)
     {
@@ -60,7 +63,8 @@ internal sealed class StoryRunner
 
         if (isNewGame)
         {
-            ShowPage("序章", "夏末的门", framed: true);
+            ShowPage("序章", "夏末的门", framed: true,
+                contentLines: CountFramedText(story.Hook, state));
             Print(story.Hook, state, framed: true);
             WriteBoxBottom();
             saves.Save(state);
@@ -73,7 +77,9 @@ internal sealed class StoryRunner
             if (state.CompletedOutcomeId is not null)
             {
                 var outcome = outcomes[state.CompletedOutcomeId];
-                ShowPage("结局", outcome.Title, framed: true);
+                ShowPage("结局", outcome.Title, framed: true,
+                    contentLines: CountFramedText(outcome.Text, state) +
+                        CountFramedVariants(outcome.Variants, state));
                 Print(outcome.Text, state, framed: true);
                 PrintVariants(outcome.Variants, state, framed: true);
                 WriteBoxBottom();
@@ -252,7 +258,8 @@ internal sealed class StoryRunner
         }
         var menuHeight = 7 + rendered.Sum(lines => lines.Length) +
             (primaryCount < options.Length ? 2 : 0);
-        if (menuHeight >= Console.WindowTop + Console.WindowHeight - Console.CursorTop)
+        if (!streamingFrameOpen &&
+            menuHeight >= Console.WindowTop + Console.WindowHeight - Console.CursorTop)
         {
             if (menuHeight + 5 >= Console.WindowHeight)
             {
@@ -284,7 +291,14 @@ internal sealed class StoryRunner
         }
         WriteBoxLine("");
         WriteBoxLine("  W/S 或 ↑↓ 选择   ·   Enter 确认");
-        WriteBoxBottom();
+        if (streamingFrameOpen)
+        {
+            WriteBoxBorder('╚', '═', '╝');
+        }
+        else
+        {
+            WriteBoxBottom();
+        }
         var bottom = Console.CursorTop;
 
         void Recolor(int index, ConsoleColor color)
@@ -384,13 +398,18 @@ internal sealed class StoryRunner
         RenderFixedOptions(options, primaryCount, selected);
         while (true)
         {
-            var key = Console.ReadKey(intercept: true).Key;
-            if (key == ConsoleKey.Enter)
+            var key = Console.ReadKey(intercept: true);
+            if (TryScrollFixedFrame(key))
+            {
+                continue;
+            }
+
+            if (key.Key == ConsoleKey.Enter)
             {
                 return options[selected].Key;
             }
 
-            var direction = key switch
+            var direction = key.Key switch
             {
                 ConsoleKey.W or ConsoleKey.UpArrow => -1,
                 ConsoleKey.S or ConsoleKey.DownArrow => 1,
@@ -443,8 +462,13 @@ internal sealed class StoryRunner
             lines.AddRange(BuildChoiceLines(option).Select(line => (line, color)));
         }
 
+        var hasScrollableStory = frameLines.Count > fixedContentHeight;
         lines.Add((string.Empty, ConsoleColor.Gray));
         lines.Add(("  W/S 或 ↑↓ 选择   ·   Enter 确认", ConsoleColor.Gray));
+        if (hasScrollableStory)
+        {
+            lines.Add(("  PgUp/PgDn 滚动剧情   ·   Home/End 跳到首尾", ConsoleColor.Gray));
+        }
 
         var availableRows = Math.Max(1, fixedOptionHeight - 3);
         if (lines.Count > availableRows)
@@ -458,33 +482,42 @@ internal sealed class StoryRunner
                 (string.Empty, ConsoleColor.Gray),
                 .. selectedLines,
                 (string.Empty, ConsoleColor.Gray),
-                ($"  {selected + 1}/{options.Length}    W/S 或 ↑↓ 选择   ·   Enter 确认", ConsoleColor.Gray)
+                ($"  {selected + 1}/{options.Length}    W/S 或 ↑↓ 选择   ·   Enter 确认"
+                    + (hasScrollableStory ? "   ·   PgUp/PgDn 滚动剧情" : string.Empty), ConsoleColor.Gray)
             ];
         }
 
         WriteBoxBorderAt(fixedOptionTop, '╔', '═', '╗');
+        WriteBoxBorderAt(fixedOptionTop + fixedOptionHeight - 1, '╚', '═', '╝');
         WriteBoxLineAt(fixedOptionTop + 1, "  玩家选项");
         for (var row = 0; row < availableRows; row++)
         {
             var line = row < lines.Count ? lines[row] : (string.Empty, ConsoleColor.Gray);
             WriteBoxLineAt(fixedOptionTop + 2 + row, line.Item1, line.Item2);
         }
-        WriteBoxBorderAt(fixedOptionTop + fixedOptionHeight - 1, '╚', '═', '╝');
         Console.SetCursorPosition(0, Math.Min(Console.WindowHeight - 1, fixedOptionTop + fixedOptionHeight));
     }
 
     private GameState NewState() => new() { CurrentSceneId = story.StartSceneId };
 
-    private void ShowPage(string section, string title, bool framed = false)
+    private void ShowPage(string section, string title, bool framed = false, int contentLines = 0)
     {
         fixedFrameOpen = false;
+        streamingFrameOpen = false;
         frameLines.Clear();
+        fixedScrollTop = 0;
         if (!Console.IsOutputRedirected)
         {
             Console.Clear();
         }
         if (framed)
         {
+            if (SupportsStreamingLayout())
+            {
+                BeginStreamingFrame(section, title, contentLines);
+                return;
+            }
+
             if (SupportsFixedLayout())
             {
                 BeginFixedFrame(section, title);
@@ -513,6 +546,25 @@ internal sealed class StoryRunner
         Console.WriteLine();
     }
 
+    private void BeginStreamingFrame(string section, string title, int contentLines)
+    {
+        streamingFrameOpen = true;
+        EnsureConsoleBufferHeight();
+        WriteBoxBorder('╔', '═', '╗');
+        for (var row = 0; row < 5 + contentLines; row++)
+        {
+            WriteBoxLine("");
+        }
+        streamingFrameBottom = Console.CursorTop;
+        WriteBoxBorder('╚', '═', '╝');
+        Console.SetCursorPosition(0, 1);
+        WriteBoxLine($"  {story.Title}  /  {section}");
+        WriteBoxLine(new string('─', BoxInnerWidth()));
+        WriteBoxLine("");
+        WriteBoxLine($"  ◆  {title}", ConsoleColor.Cyan);
+        WriteBoxLine("");
+    }
+
     private void BeginFixedFrame(string section, string title)
     {
         fixedFrameOpen = true;
@@ -532,19 +584,22 @@ internal sealed class StoryRunner
         fixedContentTop = 6;
         fixedContentHeight = Math.Max(1, fixedFrameHeight - fixedContentTop - 1);
         fixedOptionTop = fixedFrameHeight + 1;
+        fixedScrollTop = 0;
         RenderFixedFrame();
     }
 
     private void RenderFixedFrame()
     {
         WriteBoxBorderAt(0, '╔', '═', '╗');
+        WriteBoxBorderAt(fixedFrameHeight - 1, '╚', '═', '╝');
         WriteBoxLineAt(1, $"  {story.Title}  /  {fixedFrameSection}");
         WriteBoxLineAt(2, new string('─', BoxInnerWidth()));
         WriteBoxLineAt(3, string.Empty);
         WriteBoxLineAt(4, $"  ◆  {fixedFrameTitle}", ConsoleColor.Cyan);
         WriteBoxLineAt(5, string.Empty);
 
-        var visibleStart = Math.Max(0, frameLines.Count - fixedContentHeight);
+        fixedScrollTop = Math.Clamp(fixedScrollTop, 0, MaxFixedScrollTop());
+        var visibleStart = fixedScrollTop;
         for (var row = 0; row < fixedContentHeight; row++)
         {
             var lineIndex = visibleStart + row;
@@ -554,11 +609,41 @@ internal sealed class StoryRunner
             WriteBoxLineAt(fixedContentTop + row, line.Text, line.Color);
         }
 
-        WriteBoxBorderAt(fixedFrameHeight - 1, '╚', '═', '╝');
         if (Console.WindowHeight > fixedOptionTop)
         {
             Console.SetCursorPosition(0, fixedOptionTop);
         }
+    }
+
+    private int MaxFixedScrollTop() => Math.Max(0, frameLines.Count - fixedContentHeight);
+
+    private bool TryScrollFixedFrame(ConsoleKeyInfo key)
+    {
+        if (!fixedFrameOpen || frameLines.Count <= fixedContentHeight)
+        {
+            return false;
+        }
+
+        var page = Math.Max(1, fixedContentHeight - 2);
+        var target = key.Key switch
+        {
+            ConsoleKey.PageUp => fixedScrollTop - page,
+            ConsoleKey.PageDown => fixedScrollTop + page,
+            ConsoleKey.Home => 0,
+            ConsoleKey.End => MaxFixedScrollTop(),
+            ConsoleKey.UpArrow when key.Modifiers.HasFlag(ConsoleModifiers.Shift) => fixedScrollTop - 1,
+            ConsoleKey.DownArrow when key.Modifiers.HasFlag(ConsoleModifiers.Shift) => fixedScrollTop + 1,
+            _ => -1
+        };
+
+        if (target < 0)
+        {
+            return false;
+        }
+
+        fixedScrollTop = Math.Clamp(target, 0, MaxFixedScrollTop());
+        RenderFixedFrame();
+        return true;
     }
 
     private void AppendFixedFrameLine(string line, ConsoleColor color, bool reveal, ref bool skip)
@@ -571,10 +656,7 @@ internal sealed class StoryRunner
 
         var buffered = new FrameLine(color);
         frameLines.Add(buffered);
-        if (frameLines.Count > fixedContentHeight)
-        {
-            frameLines.RemoveAt(0);
-        }
+        fixedScrollTop = MaxFixedScrollTop();
 
         if (!reveal)
         {
@@ -606,16 +688,56 @@ internal sealed class StoryRunner
     private static bool SupportsFixedLayout() =>
         !Console.IsInputRedirected && !Console.IsOutputRedirected && Console.WindowHeight >= 18;
 
+    private static bool SupportsStreamingLayout() =>
+        !Console.IsInputRedirected && !Console.IsOutputRedirected && OperatingSystem.IsWindows();
+
+    private static void EnsureConsoleBufferHeight()
+    {
+        if (Console.IsOutputRedirected || !OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        try
+        {
+            // Keep enough scrollback for the current page without creating an
+            // unnecessarily deep empty scrollbar track.
+            var targetHeight = Math.Max(Console.WindowHeight * 20, 1024);
+            if (Console.BufferHeight < targetHeight)
+            {
+                Console.BufferHeight = targetHeight;
+            }
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            // Some terminals expose a smaller maximum buffer; keep their default.
+        }
+        catch (IOException)
+        {
+            // Pseudo-terminals may not support resizing their output buffer.
+        }
+        catch (InvalidOperationException)
+        {
+            // The console handle can be unavailable during startup or redirection.
+        }
+        catch (PlatformNotSupportedException)
+        {
+            // Native scrolling remains an optional presentation enhancement.
+        }
+    }
+
     private void ShowScene(Scene scene, GameState state, bool animate = true)
     {
-        ShowPage("剧情", scene.Title, framed: true);
+        ShowPage("剧情", scene.Title, framed: true,
+            contentLines: CountFramedText(scene.Text, state) +
+                CountFramedVariants(scene.Variants, state) + CountFramedPicture(scene.Picture));
         Print(scene.Text, state, animate, framed: true);
         PrintVariants(scene.Variants, state, animate, framed: true);
         PrintPicture(scene.Picture, framed: true);
         WriteBoxBottom();
     }
 
-    private static void WaitForEnter(string prompt = "Enter 继续")
+    private void WaitForEnter(string prompt = "Enter 继续")
     {
         if (Console.IsInputRedirected || Console.IsOutputRedirected)
         {
@@ -625,9 +747,22 @@ internal sealed class StoryRunner
         {
             Console.ReadKey(intercept: true);
         }
-        Console.WriteLine($"{Indent()}·  {prompt}");
-        while (Console.ReadKey(intercept: true).Key != ConsoleKey.Enter)
+        var promptText = fixedFrameOpen && frameLines.Count > fixedContentHeight
+            ? $"{prompt}   ·   PgUp/PgDn 滚动剧情"
+            : prompt;
+        Console.WriteLine($"{Indent()}·  {promptText}");
+        while (true)
         {
+            var key = Console.ReadKey(intercept: true);
+            if (TryScrollFixedFrame(key))
+            {
+                continue;
+            }
+
+            if (key.Key == ConsoleKey.Enter)
+            {
+                return;
+            }
         }
     }
 
@@ -650,7 +785,9 @@ internal sealed class StoryRunner
             state.TextValues[choice.SetText.Key] = choice.SetText.Value;
         }
 
-        ShowPage("行动", "我的选择", framed: true);
+        ShowPage("行动", "我的选择", framed: true,
+            contentLines: CountFramedText(choice.Feedback, state) +
+                CountFramedVariants(choice.FeedbackVariants, state));
         Print(choice.Feedback, state, framed: true);
         PrintVariants(choice.FeedbackVariants, state, framed: true);
         WriteBoxBottom();
@@ -751,13 +888,7 @@ internal sealed class StoryRunner
 
     private void Print(string value, GameState state, bool animate = true, bool framed = false)
     {
-        var rendered = Placeholder.Replace(value.Trim(), match =>
-        {
-            var key = match.Groups[1].Value;
-            return state.TextValues.TryGetValue(key, out var replacement)
-                ? replacement
-                : throw new InvalidOperationException($"缺少剧情文本变量：{key}");
-        });
+        var rendered = RenderText(value, state);
         if (rendered.Length == 0)
         {
             return;
@@ -858,6 +989,46 @@ internal sealed class StoryRunner
         }
     }
 
+    private static string RenderText(string value, GameState state) =>
+        Placeholder.Replace(value.Trim(), match =>
+        {
+            var key = match.Groups[1].Value;
+            return state.TextValues.TryGetValue(key, out var replacement)
+                ? replacement
+                : throw new InvalidOperationException($"缺少剧情文本变量：{key}");
+        });
+
+    private static int CountFramedText(string value, GameState state)
+    {
+        var rendered = RenderText(value, state);
+        if (rendered.Length == 0)
+        {
+            return 0;
+        }
+
+        var count = 1;
+        foreach (var paragraph in rendered.Replace("\r\n", "\n").Split('\n'))
+        {
+            if (paragraph.Length == 0)
+            {
+                count++;
+                continue;
+            }
+            var dialogue = paragraph.StartsWith('“') || paragraph.Contains("：“", StringComparison.Ordinal);
+            var prefix = $"{Indent()}{(dialogue ? "│ " : " ")}";
+            count += Wrap(paragraph, prefix, prefix, BoxRightColumn()).Count();
+        }
+        return count;
+    }
+
+    private static int CountFramedVariants(TextVariant[]? variants, GameState state) =>
+        (variants ?? []).Where(variant => Available(variant.RequiredFlagIds,
+            variant.ExcludedFlagIds, state)).Sum(variant => CountFramedText(variant.Text, state));
+
+    private static int CountFramedPicture(PictureLine[]? picture) =>
+        (picture ?? []).Sum(line => Wrap(line.Text, $"{Indent()} ", $"{Indent()} ",
+            BoxRightColumn()).Count());
+
     private static IEnumerable<string> Wrap(string value, string firstPrefix, string nextPrefix,
         int? rightEdge = null)
     {
@@ -891,6 +1062,12 @@ internal sealed class StoryRunner
         if (fixedFrameOpen)
         {
             RenderFixedFrame();
+            return;
+        }
+
+        if (streamingFrameOpen)
+        {
+            Console.SetCursorPosition(0, streamingFrameBottom + 1);
             return;
         }
 

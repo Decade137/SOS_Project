@@ -51,6 +51,8 @@
 - 2026-09-28: Before SOS Brigade members introduce themselves, player-facing scene narration and choice feedback use visible features and actions instead of character names. Menus that would scroll during W/S selection move to a separate choice page so selection recoloring uses stable screen rows.
 - 2026-09-28: The updated scenario and overflow-safe menu were republished as a Windows x64 self-contained single-file exe. The publish directory contains only `SOS_Project.exe`, and the repository-root copy has the same SHA-256 hash. The revised scene was not played.
 - 2026-09-28: At the user's request, scene and action text now render inside dynamic Unicode frames, with the player choices in a second frame below when the console window has room. Wrapped Chinese text, W/S recoloring, compact overflow handling, and redirected input remain supported. The UI change passed a Release build; it has not been played through.
+- 2026-09-29: At the user's request, fixed-frame story history is now retained instead of discarded when the viewport fills. PageUp/PageDown browse the history and Home/End jump to its ends while waiting for Enter or choosing an option; new text follows the bottom automatically.
+- 2026-09-29: At the user's request, interactive scene and action pages now use sequential variable-height frames so the terminal's native scrollbar can browse the full page; options follow the story on the same page. Windows buffer growth is best effort, and fixed-frame scrolling remains as fallback.
 
 ## Constraints
 
@@ -60,6 +62,11 @@
 - The new start screen and page layout passed build and publish; both local exe copies include this UI. No playthrough of this UI has been run.
 - 2026-09-28: At the user's request, fixed the scene and action frame layout: draw the frame before content, keep the content viewport and player-option area at fixed positions and sizes, scroll content inside its viewport, and hide the option frame until choices exist. The Debug build passed with zero warnings and errors; no interactive playthrough was run.
 - 2026-09-28: At the user's request, published the fixed-frame UI as a Windows x64 self-contained single-file exe with .NET SDK 10.0.401 and refreshed the repository-root copy. The publish directory contains only `SOS_Project.exe`; both copies are 73,602,781 bytes with matching SHA-256 `56A672EFDD1A008145C0DBD57DCE05D727F8F518B681A47BE0F4A0164BF525C8`.
+- 2026-09-29: The fixed-frame history browsing change was implemented in `Game/StoryRunner.cs` and published with .NET SDK 10.0.401 as a Windows x64 self-contained single-file exe. The publish output and repository-root copy are each 73,606,877 bytes with matching SHA-256 `B8591ACF09A28A2A9E1428228AC743A6E30E47079D6507048862CBA6582A7FCA`. The game has not been played through yet.
+- 2026-09-29: The streaming frame change was implemented in `Game/StoryRunner.cs`; a local .NET 10 build passed with zero warnings and errors. The interactive layout has not been played through.
+- 2026-09-29: Republished the streaming-frame change as a Windows x64 self-contained single-file exe with .NET SDK 10.0.401 and refreshed the repository-root copy. Both files are 73,606,877 bytes with matching SHA-256 `1DC221BE0B87D0C4515468C4FD9774F3D2F2539F326A9552C3A0B18547CBED8D`. The full game was not replayed.
+- 2026-09-29: Interactive story and option frames now draw their full borders before text or choices are filled in. Frame height follows wrapped content; the terminal buffer still provides scrolling. The Windows x64 single-file exe was republished and copied to the repository root; both copies match at SHA-256 `EA1636150578B39DAE19E90077993CC20D6281169DE42EAC4D1E22A5E3EC7793`.
+- 2026-09-29: Fixed the Windows streaming menu-frame bug: option contents are now written in order after the story frame instead of being backfilled into a pre-drawn second frame, which had placed the title and side borders below its bottom edge.
 
 ## Open questions
 
