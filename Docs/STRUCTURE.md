@@ -19,8 +19,8 @@
 - `Game/SaveStore.cs`: the versioned single-slot local save and its integrity check.
 - `Game/StoryRunner.cs`: separate start/scene/action/journal/ending pages, variable-height Unicode story frames with terminal-buffer scrolling on interactive terminals, sequentially rendered option frames, and a fixed-frame PageUp/PageDown fallback, wrapped story output with dialogue cues, bullet-marked W/S and Enter menus with full-choice selection color, state effects, immediate re-reading, and optional color pictures.
 - `Game/OwnFileCleanup.cs`: scoped send-back ending cleanup for this game's save and published exe.
-- `Scenarios/00-zero-floor.md`: authored first-person Chinese scenario 0, with the eight-stage story circle and full module sections.
-- `Scenarios/ZeroFloor.Play.cs`: compiled player-facing data for the full first scenario, Hook through S16, K01–K10, H01–H04, and E01/E02.
+- `Scenarios/00-zero-floor.md`: authored first-person Chinese scenario 0, “异世界人入团考试”, with the eight-stage story circle and full module sections. The file name is historical.
+- `Scenarios/ZeroFloor.Play.cs`: compiled player-facing data for the full first scenario, Hook through S16, K01–K10, H01–H04 plus H01_REVISED, and E01–E03. The class name `ZeroFloor` is historical.
 - `Docs/LOGS/`: deep session notes. Empty except `.gitkeep`.
 - `.git/`: repository metadata. Do not hand-edit.
 
@@ -40,9 +40,9 @@ Chinese mirrors use the same path plus `.zh-CN.md`. There is no `AGENTS.zh-CN.md
 - Next work: `Docs/TODO.md`, `Docs/TODO.zh-CN.md`
 - Runtime decision: .NET 10 C# console with a Windows x64 self-contained single-file exe, in `Docs/GAME_DESIGN.md`. Source is under `Game/`; a local publish is at `Game/bin/Release/net10.0/win-x64/publish/SOS_Project.exe`, and a copy is at the repository root as `SOS_Project.exe`.
 
-`Scenarios/` contains the full scenario 0 module and compiled story data. Scenario 0 assumes the player knows the SOS Brigade and its story; player output conveys that familiarity through details, records, time traces, and character reactions instead of explaining its source. The C# project is in `Game/`. The new start screen and page layout passed a Release build and Windows x64 single-file publish. Both endings and a disposable published copy's E01 self-deletion were validated on an earlier version; the new UI has not been played.
+`Scenarios/` contains the full scenario 0 module and compiled story data. Scenario 0 assumes the player knows the SOS Brigade and its story, including the Endless Eight loop; player output conveys that familiarity through details, records, and character reactions instead of explaining its source. The C# project is in `Game/`. The start screen and page layout passed a Release build and Windows x64 single-file publish earlier.
 
-The scenario Markdown and compiled story data share the current prose edits, including descriptions before the brigade's introductions. The published and repository-root exe files include those edits and the bullet-marked menu with full-choice selection color and overflow handling.
+The scenario Markdown and compiled story data were rewritten together on 2026-09-30 and match. `Game/SaveStore.cs` now writes save version 2, so older saves are rejected. The published and repository-root exe files predate this rewrite; it has not been built or played.
 
 ## Documentation index
 

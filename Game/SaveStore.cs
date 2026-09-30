@@ -8,7 +8,7 @@ internal sealed class SaveStore
     private static readonly byte[] Magic = "SOSG"u8.ToArray();
     private static readonly UTF8Encoding Utf8 = new(false, true);
 
-    private const byte Version = 1;
+    private const byte Version = 2;
     private const int ChecksumBytes = 32;
     private const int MaxFileBytes = 4 * 1024 * 1024;
     private const int MaxStringBytes = 64 * 1024;

@@ -21,8 +21,8 @@
 - `Game/SaveStore.cs`：带完整性校验的单一版本化本地存档。
 - `Game/StoryRunner.cs`：独立的首页／场景／行动／档案／结局页面、交互终端中随内容变高并由终端缓冲区滚动的剧情 Unicode 边框、按输出顺序绘制的选项框，以及无法流式显示时回退的固定边框与 PageUp/PageDown 浏览、限宽正文和对白提示、圆点标记且选中项全文变色的 W/S 与 Enter 菜单、状态效果、即时重读与可选彩色画面。
 - `Game/OwnFileCleanup.cs`：送返结局中限定范围的本作存档和已发布 exe 清理。
-- `Scenarios/00-zero-floor.md`：已写的中文第一人称第 0 号剧本，含八阶段故事圆环与完整模块章节。
-- `Scenarios/ZeroFloor.Play.cs`：编译用首个完整剧本的玩家剧情数据，涵盖开场至 S16、K01—K10、H01—H04、E01/E02。
+- `Scenarios/00-zero-floor.md`：已写的中文第一人称第 0 号剧本《异世界人入团考试》，含八阶段故事圆环与完整模块章节；文件名沿用旧名。
+- `Scenarios/ZeroFloor.Play.cs`：编译用首个完整剧本的玩家剧情数据，涵盖开场至 S16、K01—K10、H01—H04 及 H01_REVISED、E01—E03；类名 `ZeroFloor` 沿用旧名。
 - `Docs/LOGS/`：长会话笔记。目前只有 `.gitkeep`。
 - `.git/`：仓库元数据。不要手改。
 
@@ -42,9 +42,9 @@
 - 下一步：`Docs/TODO.md`，`Docs/TODO.zh-CN.md`
 - 运行时决定：.NET 10 的 C# 控制台与 Windows x64 自包含单文件 exe，写在 `Docs/GAME_DESIGN.md`。源码位于 `Game/`；本地发布文件位于 `Game/bin/Release/net10.0/win-x64/publish/SOS_Project.exe`，仓库根目录另有一份 `SOS_Project.exe`。
 
-`Scenarios/` 包含第 0 号完整剧本和编译用剧情数据。第 0 号剧本默认玩家熟悉 SOS 团及其相关故事，玩家输出通过细节、档案、时间轨迹和角色反应体现这份熟悉，不直接解释其来源。C# 工程位于 `Game/`。新的开始界面与分页排版已通过 Release 构建及 Windows x64 单文件发布。双结局与临时发布副本的 E01 自删在更早版本上验证过；新界面尚未试玩。
+`Scenarios/` 包含第 0 号完整剧本和编译用剧情数据。第 0 号剧本默认玩家熟悉 SOS 团及其相关故事（包括无尽八月的循环），玩家输出通过细节、记录和角色反应体现这份熟悉，不直接解释其来源。C# 工程位于 `Game/`。开始界面与分页排版此前已通过 Release 构建及 Windows x64 单文件发布。
 
-剧本 Markdown 与编译用剧情数据已同步修改当前文案，包括团员介绍前的外貌与动作描写；发布目录及仓库根目录的 exe 都包含这些文案，以及圆点标记、选中项全文变色与溢出处理的菜单。
+剧本 Markdown 与编译用剧情数据已于 2026-09-30 同步重写，内容一致。`Game/SaveStore.cs` 现在写入存档版本 2，旧存档会被拒绝。发布目录及仓库根目录的 exe 早于这次重写；重写版尚未构建或试玩。
 
 ## 文档索引
 

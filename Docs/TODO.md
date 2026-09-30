@@ -15,7 +15,7 @@ Status legend: `Not started`, `Blocked by product choice`, `Ready for design`, `
 - Status: Complete
 - Dependencies: DOC-001
 - Current files: `Docs/GAME_DESIGN.md` open questions, `Docs/MEMORY.md`
-- Work: the selected first module uses the building's passage across years, cross-era relationships, and boundary evidence. It is Chinese first person in a fictional unnamed city and follows the eight-stage story circle. Attribute names, values, and check resolution remain open for future modules; this one uses direct options.
+- Work: the first module, rewritten 2026-09-30, is an Endless Eight branch on 2009-08-31: an otherworlder entrance exam, elimination deduction, and a written-in past. It is Chinese first person and follows the eight-stage story circle. Attribute names, values, and check resolution remain open for future modules; this one uses direct options.
 - Done when: the selected story direction and first-person language are recorded in `Docs/MEMORY.md` and `Docs/GAME_DESIGN.md` and reviewed against the completed module (met).
 
 ## P1
@@ -24,8 +24,8 @@ Status legend: `Not started`, `Blocked by product choice`, `Ready for design`, `
 - Status: Complete
 - Dependencies: DES-002
 - Current files: `Scenarios/00-zero-floor.md`
-- Work: one Chinese first-person Markdown module with the full story circle, original prose, two endings, clue-gated deduction, and direct options.
-- Done when: all contracted sections, reveal conditions, clue gates, and beat options are present, with editorial review and both ending paths played through (met).
+- Work: one Chinese first-person Markdown module with the full story circle, original prose, three endings, clue-gated deduction, and direct options.
+- Done when: all contracted sections, reveal conditions, clue gates, and beat options are present, with editorial review and all ending paths played through. Met for the previous version. The 2026-09-30 rewrite still needs a build and playthrough of E01, E02, and E03.
 
 ### ENG-001 C# console runtime
 - Status: Complete
