@@ -1,3 +1,9 @@
-/Game/bin/
-/Game/obj/
-/SOS_Project.exe
+/tools/
+/Build/
+/pack/node_modules/
+/Play/game/cache/
+/Play/game/saves/
+/Play/**/*.rpyc
+/Play/log.txt
+/Play/errors.txt
+/Play/traceback.txt

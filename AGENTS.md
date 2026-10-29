@@ -1,12 +1,12 @@
 # AGENTS.md
 
-SOS_Project is an unofficial single-player console text game. Scenario modules follow a Call of Cthulhu–style TRPG structure; the fiction is the world of The Melancholy of Haruhi Suzumiya. Keep every change small, explicit, and easy for the next AI or developer to inspect.
+SOS_Project is an unofficial single-player text game. Scenario modules follow a Call of Cthulhu–style TRPG structure; the fiction is the world of The Melancholy of Haruhi Suzumiya. Keep every change small, explicit, and easy for the next AI or developer to inspect.
 
 ## Hard Rules
 
 - Prefer the smallest working change. Avoid speculative abstractions.
 - Do not use reflection unless the user explicitly asks.
-- The selected runtime is a C# console program, recorded in `Docs/GAME_DESIGN.md` and implemented under `Game/`. Do not add Unity. The former parent folder name `UnityProject` did not denote a Unity project.
+- The selected runtime is Ren'Py 8.5.3, recorded in `Docs/GAME_DESIGN.md` and implemented under `Play/`. Double-click `pack.bat` to build `Build/SOS_Project/SOS_Project.exe`. Do not add Unity, and do not move the playable game back to a C# console. The former parent folder name `UnityProject` did not denote a Unity project.
 - Do not run an IDE, engine, automated tests, or a dev server unless the user explicitly asks.
 - Do not invoke skills unless the user explicitly asks for that skill.
 - Preserve existing user changes in a dirty worktree. Never revert unrelated files.
@@ -19,20 +19,20 @@ SOS_Project is an unofficial single-player console text game. Scenario modules f
 
 ## Product Direction
 
-- Target: a C# console session. Mostly prose, occasional `■` pictures in console colors, bullet-marked options with full-choice selection color, the player plays themself, deduction puzzles. Module contract: `Docs/GAME_DESIGN.md`.
-- Current implementation: the complete scenario 0 is connected to the C# console program under `Game/`. Its .NET 10 build, both endings, and Windows x64 single-file publish have been validated locally.
+- Target: a Ren'Py window on Windows. Mostly prose, occasional colored `■` pictures, bullet-marked options with full-choice selection color, the player plays themself, deduction puzzles. Module contract: `Docs/GAME_DESIGN.md`.
+- Current implementation: the complete scenario 0 is the Ren'Py project under `Play/`. `pack.bat` builds the Windows game.
 
 ## Code Style
 
 - Prefer small compositional units with one responsibility.
-- Use C# and `System.Console`. Do not add a framework unless the user asks.
+- The playable game is Ren'Py script and Python under `Play/game/`. Do not add another framework unless the user asks.
 - Keep scenario prose in `Scenarios/` files, separate from engine code.
 - Prefer project-owned code. There is no vendor tree yet.
 - If a vendor tree is added later, patch it only when public APIs are insufficient, and record the reason in `Docs/MEMORY.md`.
 
 ## Ownership
 
-- Project-owned: `AGENTS.md`, `README.md`, `.gitignore`, `Docs/`, `Scenarios/`, and `Game/`.
+- Project-owned: `AGENTS.md`, `README.md`, `.gitignore`, `Docs/`, `Scenarios/`, `Play/`, `pack.bat`, `pack.ps1`, and `pack/` (not `pack/node_modules/`).
 - Do not hand-edit `.git/`.
 - `Docs/AI_PROJECT_HANDOFF_RULES.md` is the portable handoff spec. Change this project's policy in `AGENTS.md`. Do not rewrite the portable spec unless the user asks to change the handoff system.
 

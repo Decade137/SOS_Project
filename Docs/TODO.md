@@ -27,23 +27,23 @@ Status legend: `Not started`, `Blocked by product choice`, `Ready for design`, `
 - Work: one Chinese first-person Markdown module with the full story circle, original prose, three endings, clue-gated deduction, and direct options.
 - Done when: all contracted sections, reveal conditions, clue gates, and beat options are present, with editorial review and all ending paths played through. Met for the previous version. The 2026-09-30 rewrite still needs a build and playthrough of E01, E02, and E03.
 
-### ENG-001 C# console runtime
-- Status: Complete
-- Dependencies: the user asked to begin implementation. Runtime choice is a .NET 10 C# console. Ship target is a Windows x64 self-contained single-file exe.
-- Current files: `Game/SOS_Project.csproj`, `Game/Program.cs`, `Game/Story.cs`, `Game/GameState.cs`, `Game/SaveStore.cs`, `Game/StoryRunner.cs`, `Game/OwnFileCleanup.cs`.
-- Work: the source advances numbered choices, applies clue and flag gates and effects, re-reads found material, prints occasional colored `■` pictures, resumes a single save, and handles both outcomes with scoped cleanup for the send-back ending. Keeper notes stay out of player output.
-- Done when: static review confirms the source follows the design contract and an authorized .NET 10 build and both ending runs confirm console behavior (met). No automated test suite was run. Do not add Unity.
+### ENG-001 Ren'Py window runtime
+- Status: Implemented; validation pending
+- Dependencies: the user asked to leave the console and use Ren'Py. Ship target is a Windows build produced by `pack.bat`.
+- Current files: `Play/game/script.rpy`, `Play/game/options.rpy`, `Play/game/story_data.py`, `Play/game/engine.rpy`, `Play/game/screens.rpy`, `pack.bat`, `pack.ps1`.
+- Work: the source advances choices, applies clue and flag gates and effects, re-reads found material, shows occasional colored `■` pictures, resumes a single save, and handles the three outcomes with scoped cleanup for the send-back ending. Keeper notes stay out of player output. On 2026-10-21, `pack.ps1` produced the exe and the packed window opened; a story playthrough is still pending.
+- Done when: static review confirms the source follows the design contract, `pack.bat` produces `Build/SOS_Project/SOS_Project.exe`, and a playthrough confirms E01, E02, and E03. No automated test suite is run. Do not add Unity.
 
 ### ENG-002 Connect the rest of scenario 0
 - Status: Complete
 - Dependencies: ENG-001, DES-003; resolve their validation findings as the remaining content is connected.
-- Current files: `Scenarios/00-zero-floor.md`, `Scenarios/ZeroFloor.Play.cs`, `Game/Story.cs`, `Game/StoryRunner.cs`.
+- Current files: `Scenarios/00-zero-floor.md`, `Play/game/story_data.py`, `Play/game/engine.rpy`.
 - Work: connect S06–S16, the remaining clues and handouts, gated deduction, and both ending paths without exposing keeper notes. Preserve direct options and stage handout additions to avoid early clues.
 - Done when: static flow review confirms both endings are reachable through documented conditions and feedback, and an authorized play run confirms both paths in the program (met).
 
-### REL-001 Windows single-file release
-- Status: Complete
-- Dependencies: ENG-001, ENG-002, and explicit user authorization to build and publish (fulfilled).
-- Current files: `Game/SOS_Project.csproj`, `README.md`, local ignored output `Game/bin/Release/net10.0/win-x64/publish/SOS_Project.exe`.
-- Work: built and played both paths, published the Windows x64 self-contained single-file exe, and verified E01 self-deletion on a disposable copy.
-- Done when: the resulting exe and both endings have been observed on the target platform and the local release file is ready to hand over (met).
+### REL-001 Windows Ren'Py build
+- Status: Implemented; validation pending
+- Dependencies: ENG-001, ENG-002. The user asked for a packager they can run without asking again.
+- Current files: `pack.bat`, `pack.ps1`, `Play/game/options.rpy`, `README.md`, local ignored output `Build/SOS_Project/SOS_Project.exe`.
+- Work: `pack.bat` builds the Windows game folder. E01 deletes the save and schedules deletion of only that folder's `SOS_Project.exe`. On 2026-10-21, `pack.ps1` produced `dist/SOS_Project/SOS_Project.exe` and the window opened. E01 cleanup on a disposable copy is still pending.
+- Done when: `pack.bat` has produced the exe, and a playthrough has confirmed E01, E02, and E03, including E01 cleanup on a disposable copy.

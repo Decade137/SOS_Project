@@ -1,13 +1,13 @@
 # SOS_Project
 
-Unofficial single-player C# console text game. The player picks numbered options, plays themself, and solves deduction puzzles. Scenario modules follow a Call of Cthulhu–style TRPG structure. The fiction is the world of The Melancholy of Haruhi Suzumiya.
+Unofficial single-player text game. The player picks bullet-marked options, plays themself, and solves deduction puzzles. Scenario modules follow a Call of Cthulhu–style TRPG structure. The fiction is the world of The Melancholy of Haruhi Suzumiya.
 
-非官方单人 C# 控制台文字游戏。玩家选择编号选项，扮演自己，进行推理解谜。剧本模块用类似 COC 跑团的结构。故事世界是《凉宫春日的忧郁》。
+非官方单人文字游戏。玩家选择圆点选项，扮演自己，进行推理解谜。剧本模块用类似 COC 跑团的结构。故事世界是《凉宫春日的忧郁》。
 
 - Policy: [AGENTS.md](AGENTS.md)
 - Design: [Docs/GAME_DESIGN.md](Docs/GAME_DESIGN.md) · [中文](Docs/GAME_DESIGN.zh-CN.md)
 - Handoff: [Docs/MEMORY.md](Docs/MEMORY.md) · [Docs/TODO.md](Docs/TODO.md)
 
-The source contains the complete first scenario, including both endings. With the .NET 10 SDK installed, run `dotnet run --project Game/SOS_Project.csproj`. Progress is saved in `%LOCALAPPDATA%/SOS_Project/save.bin`. To publish the Windows x64 self-contained single-file game, run `dotnet publish Game/SOS_Project.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false`. The current W/S and text presentation has passed a Release build and single-file publish; the exe is at `Game/bin/Release/net10.0/win-x64/publish/SOS_Project.exe`. Both endings were played on the earlier version, and E01 self-deletion was verified using a disposable published copy; the current interaction has not yet been played. Build outputs are ignored by Git.
+The playable game is the Ren'Py 8.5.3 project in `Play/`. On Windows, double-click `pack.bat` or run `powershell -NoProfile -ExecutionPolicy Bypass -File pack.ps1`. The script downloads the Ren'Py SDK on first use, prepares a Chinese font, and writes `Build/SOS_Project/SOS_Project.exe`. Double-click that exe. Keep the whole `Build/SOS_Project` folder together; the exe starts the game and the files beside it are the runtime. A player does not install Ren'Py. Node.js is required on the machine that packs, because the font subset is rebuilt from the script text. Progress is saved in `%LOCALAPPDATA%/SOS_Project/save.json`.
 
-源码已接入首个剧本全篇及双结局。安装 .NET 10 SDK 后，可运行 `dotnet run --project Game/SOS_Project.csproj`。进度存于 `%LOCALAPPDATA%/SOS_Project/save.bin`。发布 Windows x64 自包含单文件游戏可运行 `dotnet publish Game/SOS_Project.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false`。当前 W/S 选项与逐字演出已通过 Release 构建及单文件发布；exe 位于 `Game/bin/Release/net10.0/win-x64/publish/SOS_Project.exe`。双结局曾在旧版试玩，E01 自删曾用临时发布副本验证；当前交互尚未试玩。构建产物由 Git 忽略。
+可玩工程是 `Play/` 里的 Ren'Py 8.5.3 项目。在 Windows 上双击 `pack.bat`，或运行 `powershell -NoProfile -ExecutionPolicy Bypass -File pack.ps1`。脚本会在第一次使用时下载 Ren'Py SDK、准备中文字体，并写出 `Build/SOS_Project/SOS_Project.exe`。双击这个 exe 即可开始。整个 `Build/SOS_Project` 文件夹要留在一起：exe 负责启动，旁边的文件是运行所需的程序。玩家不必安装 Ren'Py。打包的那台电脑需要 Node.js，因为字体子集会按脚本文字重新生成。进度存在 `%LOCALAPPDATA%/SOS_Project/save.json`。
